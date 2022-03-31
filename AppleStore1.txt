@@ -1,0 +1,339 @@
+USE AppleStore
+GO
+
+
+DROP DATABASE AppleStore
+
+
+CREATE DATABASE AppleStore
+
+
+
+if OBJECT_ID ('dbo.Colors') is null----СОФІЯ
+CREATE TABLE dbo.Colors (
+	ID int not null identity (1,1),
+	Name varchar(20) not null,
+	CONSTRAINT PK_Colors PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+/*
+if COL_LENGTH ('dbo.Colors', 'ColorType') is null---- додавання нової колонки
+ALTER TABLE dbo.Colors ADD ColorType int not null
+
+if COL_LENGTH ('dbo.Colors', 'ColorType') is not null----- видалення існуючої колонки
+ALTER TABLE dbo.Colors DROP COLUMN ColorType ;
+*/
+--DROP TABLE IF EXISTS dbo.Colors----- ВИДАЛЕННЯ ТАБЛИЦІ
+
+
+if OBJECT_ID ('dbo.Categories') is null----СОФІЯ
+CREATE TABLE dbo.Categories (
+	ID int not null identity (1,1),
+	Name varchar(40) not null,
+	CONSTRAINT PK_Categories PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+IF EXISTS (SELECT 1 FROM information_schema.table_constraints  ----ПЕРЕВІРКА І ВИДАЛЕННЯ CONSTRAINT
+WHERE constraint_type = 'PRIMARY KEY'   
+AND table_name = 'Categories'
+AND CONSTRAINT_NAME = 'PK_Categories'
+ )
+ALTER TABLE dbo.Categories DROP CONSTRAINT PK_Categories;
+
+
+
+
+if OBJECT_ID ('dbo.Positions') is null----Володя
+CREATE TABLE dbo.Positions (
+    ID int not null identity (1,1) ,
+	Name varchar(40) not null ,
+	Salary decimal (7,2) not null,
+	CONSTRAINT PK_Positions PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+
+IF OBJECT_ID('dbo.PiggyBank') IS NULL----ВІКА ДОБРУС
+CREATE TABLE dbo.PiggyBank (
+    ID int NOT NULL IDENTITY (1,1),
+    [Sum] decimal (7,2),
+	CONSTRAINT PK_PiggyBank PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+IF OBJECT_ID('dbo.BonusCard') IS NULL----ВІКА ДОБРУС
+CREATE TABLE dbo.BonusCard (
+    ID int NOT NULL IDENTITY (1,1),
+    CardNumber int NOT NULL,
+	Value int NOT NULL,
+	LowerLimit int NOT NULL,
+	UpperLimit int NOT NULL,
+	Id_PiggyBank int NOT NULL,
+	CONSTRAINT PK_BonusCard PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_PiggyBankBonusCard FOREIGN KEY (Id_PiggyBank)
+	REFERENCES PiggyBank(ID)
+);
+GO
+
+IF OBJECT_ID('dbo.Guarantees') IS NULL---ОСТАП
+CREATE TABLE dbo.Guarantees (
+    ID int NOT NULL identity (1,1),
+    MonthTerm int NOT NULL,
+    OrderPrice decimal (7,2) NOT NULL,
+    CONSTRAINT PK_Guarantees PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+
+if OBJECT_ID ('dbo.Countries') is null----СВЯТОСЛАВ
+CREATE TABLE Countries(
+    ID int not null identity (1,1) ,
+	CountryName varchar(40) not null,
+	CONSTRAINT PK_Countries PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+if OBJECT_ID ('dbo.Cities') is null----СВЯТОСЛАВ
+CREATE TABLE Cities(
+    ID int not null identity (1,1) ,
+	CityName varchar(40) not null,
+	Id_Country int not null,
+	CONSTRAINT PK_Cities PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_CountryCities FOREIGN KEY (Id_Country)
+	REFERENCES Countries(ID)
+);
+GO
+
+
+if OBJECT_ID ('dbo.Suppliers') is null----СВЯТОСЛАВ
+CREATE TABLE Suppliers(
+    ID int not null identity (1,1) ,
+	SupplierName varchar(60) not null ,
+	Id_City int not null ,
+	Phone varchar(20) not null,
+	Email varchar(40) not null,
+	CONSTRAINT PK_Suppliers PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_CitySuppliers FOREIGN KEY (Id_City)
+	REFERENCES Cities(ID)
+);
+GO
+
+IF OBJECT_ID ('dbo.ReasonsReturn') is null----ТАНЯ
+CREATE TABLE dbo.ReasonsReturn (
+    ID int not null identity (1,1) ,
+	ReasonName varchar(60)
+	CONSTRAINT PK_ReasonReturn PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+if OBJECT_ID ('dbo.Delivery') is null--------Сергій
+CREATE TABLE dbo.Delivery (
+    ID int not null identity (1,1),
+	DeliveryType varchar(50) not null,
+	CONSTRAINT PK_Delivery PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+
+if OBJECT_ID ('dbo.Customers') is null----Сергій
+CREATE TABLE dbo.Customers (
+    ID int not null identity (1,1),
+	FirstName varchar(50) not null,
+	LastName varchar(50) not null,
+	Phone varchar(12) not null,
+	Email varchar(50),
+	Id_City int,
+	Id_BonusCard int not null,
+	RegistrationDate date not null,
+	CONSTRAINT PK_Customers PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_CityCustomers FOREIGN KEY (Id_City)
+	REFERENCES Cities(ID),
+	CONSTRAINT FK_BonusCardCustomers FOREIGN KEY (Id_BonusCard)
+	REFERENCES BonusCard(ID)
+);
+GO
+
+
+if OBJECT_ID ('dbo.Memories') is null----Віка А
+CREATE TABLE dbo.Memories (
+	ID int not null identity (1,1),
+	Name varchar(40) not null,
+	CONSTRAINT PK_Memories PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+if OBJECT_ID ('dbo.Screens') is null----Віолетта
+CREATE TABLE dbo.Screens (
+	ID int not null identity (1,1),
+	Name varchar(40) not null,
+	CONSTRAINT PK_Screens PRIMARY KEY CLUSTERED (ID ASC)
+);
+GO
+
+if OBJECT_ID ('dbo.Products') is null----Віолетта
+CREATE TABLE dbo.Products (
+	ID int not null identity (1,1),
+	SerialNumber int not null,
+	ProductName varchar(100),
+	Id_Category int not null,
+	Id_Color int,
+	Id_Memory int,
+	Id_Screen int
+	CONSTRAINT PK_Products PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_CategoryProducts FOREIGN KEY (Id_Category)
+	REFERENCES Categories(ID),
+	CONSTRAINT FK_ColorProducts FOREIGN KEY (Id_Color)
+	REFERENCES Colors(ID),
+	CONSTRAINT FK_MemoryProducts FOREIGN KEY (Id_Memory)
+	REFERENCES Memories(ID),
+	CONSTRAINT FK_ScreenProducts FOREIGN KEY (Id_Screen)
+	REFERENCES Screens(ID)
+);
+GO
+
+
+if OBJECT_ID ('dbo.Stores') is null----СОФІЯ
+CREATE TABLE dbo.Stores (
+	ID int not null identity (1,1),
+	Id_City int not null,
+	Adress varchar(60) not null,
+	Phone varchar (20) not null,
+	Email varchar (30) not null,
+	CONSTRAINT PK_Stores PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_CityStores FOREIGN KEY (Id_City)
+	REFERENCES Cities(ID)
+);
+GO
+
+if OBJECT_ID ('dbo.Employees') is null----ВОЛОДЯ
+CREATE TABLE dbo.Employees (
+    ID int not null identity (1,1) ,
+	FirstName varchar(40) not null ,
+	LastName varchar(40) not null,
+	Phone varchar (20) not null,
+	Email varchar (30) not null,
+	DateofBirhday date not null,
+	Id_City int not null,
+	HireDay date not null,
+	FireDay date not null,
+	Id_Position int not null,
+	Id_Store int not null
+	CONSTRAINT PK_Employees PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT UQ_Employees_Phone UNIQUE (Phone),
+	CONSTRAINT UQ_Employees_Email UNIQUE (Email),
+	CONSTRAINT FK_CityEmployees FOREIGN KEY (Id_City)
+	REFERENCES Cities(ID),
+	CONSTRAINT FK_PositionEmployees FOREIGN KEY (Id_Position)
+	REFERENCES Positions(ID),
+	CONSTRAINT FK_StoreEmployees FOREIGN KEY (Id_Store)
+	REFERENCES Stores(ID)
+);
+GO
+
+
+if OBJECT_ID ('dbo.Warehouses') is null----Віка А
+CREATE TABLE dbo.Warehouses (
+	ID int not null identity (1,1),
+	Id_Product int,
+	Id_Supplier int,
+	Id_Employee int,
+	DeliveryDay date not null,
+	Price decimal(7,2) not null, --- purchase price, cost 
+	CONSTRAINT PK_Warehouses PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_ProductWarehouses FOREIGN KEY (Id_Product)
+	REFERENCES Products(ID),
+	CONSTRAINT FK_SupplierWarehouses FOREIGN KEY (Id_Supplier)
+	REFERENCES Suppliers(ID),
+	CONSTRAINT FK_EmployeeWarehouses FOREIGN KEY (Id_Employee)
+	REFERENCES Employees(ID)
+);
+GO
+
+
+
+
+IF OBJECT_ID('dbo.OrdersOffline') IS NULL----ВІКА ДОБРУС
+CREATE TABLE dbo.OrdersOffline (
+    ID int NOT NULL IDENTITY (1,1),
+	Id_Store int NOT NULL,
+    Id_Customer int NOT NULL,
+    DateOfSale date NOT NULL,
+    Id_Product int NOT NULL,
+	Id_Employee int NOT NULL,
+	EmployeesBonus decimal (7,2) NOT NULL,
+    OrderPrice decimal (7,2) NOT NULL,
+    Id_Guarantee int NOT NULL,
+    EndDayGuarantee date NOT NULL,
+	CONSTRAINT PK_OrdersOffline PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_StoreOrdersOffline FOREIGN KEY (Id_Store)
+	REFERENCES Stores(ID),
+	CONSTRAINT FK_CustomerOrdersOffline FOREIGN KEY (Id_Customer)
+	REFERENCES Customers(ID),
+	CONSTRAINT FK_ProductOrdersOffline FOREIGN KEY (Id_Product)
+	REFERENCES Products(ID),
+	CONSTRAINT FK_EmployeeOrdersOffline FOREIGN KEY (Id_Employee)
+	REFERENCES Employees(ID),
+	CONSTRAINT FK_GuaranteeOrdersOffline FOREIGN KEY (Id_Guarantee)
+	REFERENCES Guarantees(ID)
+);
+GO
+
+
+
+IF OBJECT_ID('dbo.OrdersOnline') IS NULL---ОСТАП
+CREATE TABLE dbo.OrdersOnline (
+    ID int NOT NULL identity (1,1),
+    Id_Customer int NOT NULL,
+    DateOfSale date NOT NULL,
+    Id_Product int NOT NULL,
+    OrderPrice decimal (7,2) NOT NULL,---cost plus markup
+    Id_Delivery int NOT NULL,
+    DeliveryAdress varchar (100) NOT NULL,
+    Id_Guarantee int NOT NULL,
+    EndDayGuarantee date NOT NULL,
+    CONSTRAINT PK_OrdersOnline PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_CustomerOrdersOnline FOREIGN KEY (Id_Customer)
+	REFERENCES Customers(ID),
+	CONSTRAINT FK_ProductOrdersOnline FOREIGN KEY (Id_Product)
+	REFERENCES Products(ID),
+	CONSTRAINT FK_DeliveryOrdersOnline FOREIGN KEY (Id_Delivery)
+	REFERENCES Delivery(ID),
+	CONSTRAINT FK_GuaranteeOrdersOnline FOREIGN KEY (Id_Guarantee)
+	REFERENCES Guarantees(ID)
+);
+GO
+
+IF OBJECT_ID ('dbo.OrdersReturnOnline') is null----ТАНЯ
+CREATE TABLE dbo.OrdersReturnOnline (
+    ID int not null identity (1,1) ,
+	Id_OrdersOnline int not null ,
+	ReturnDateOnline date not null,
+	Id_Reason int
+	CONSTRAINT PK_OrdersReturnOnline PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_OrdersOnlineOrdersReturnOnline FOREIGN KEY (Id_OrdersOnline)
+	REFERENCES OrdersOnline(ID),
+	CONSTRAINT FK_ReasonOrdersReturnOnline FOREIGN KEY (Id_Reason)
+	REFERENCES ReasonsReturn(ID)
+);
+GO
+
+IF OBJECT_ID ('dbo.OrdersReturnOffline') is null----ТАНЯ
+CREATE TABLE dbo.OrdersReturnOffline (
+    ID int not null identity (1,1) ,
+	Id_OrdersOffline int not null ,
+	ReturnDateOffline date not null,
+	Id_Reason int,
+	CONSTRAINT PK_OrdersReturnOffline PRIMARY KEY CLUSTERED (ID ASC),
+	CONSTRAINT FK_OrdersOfflineOrdersReturnOffline FOREIGN KEY (Id_OrdersOffline)
+	REFERENCES OrdersOffline(ID),
+	CONSTRAINT FK_ReasonOrdersReturnOffline FOREIGN KEY (Id_Reason)
+	REFERENCES ReasonsReturn(ID)
+);
+GO
+
+
+ 
+
+drop table Memories  
+
