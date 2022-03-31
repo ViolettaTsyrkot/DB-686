@@ -75,6 +75,8 @@ git clone
 git push origin Violetta коли в локальному репозиторії появляється нова гілка і її треба закинути в віддалений репозиторій то потрібно написати команду  
 git push origin і додати до неї ім'я нової гілки (в даному випадку Violetta)
 
+:q!  ця команда дозволяє виходити, якщо не підмінений win на notepad.exe
+
 
 added all created tables of AppleStore database
 
